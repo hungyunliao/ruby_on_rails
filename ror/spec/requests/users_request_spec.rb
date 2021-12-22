@@ -1,13 +1,15 @@
 require "rails_helper"
 
-RSpec.describe "My first request test", :type => :request do
+RSpec.describe "User", :type => :request do
 
-    it "creates user" do
-        @expected = { "first" => "John", "last" => "Potter", "gender" => "male", "age" => 46 }.to_json
+    describe ".show" do
+        it "shows user info" do
+            @expected = { "first" => "John", "last" => "Potter", "gender" => "male", "age" => 46 }.to_json
 
-        headers = { "ACCEPT" => "application/json" }
-        get "/users", :headers => headers
+            headers = { "ACCEPT" => "application/json" }
+            get "/users/1", :headers => headers
 
-        response.body.should == @expected
+            response.body.should == @expected
+        end
     end
 end
