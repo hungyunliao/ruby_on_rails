@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
     def index
-        @articles = Article.all
+        render json: { :sucess => true, :message => "Hello World." }
     end
 end
