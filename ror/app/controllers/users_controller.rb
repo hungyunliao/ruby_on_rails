@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
     def index
-        render json: { "abc": "123"}
+        render json: { :first => "John", :last => "Potter", :gender => "male", :age => 46 }
     end
 end
