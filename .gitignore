@@ -1,1 +1,1 @@
-.docker/volumes/database/pg_stat_tmp/*
+.docker/volumes/database/*
