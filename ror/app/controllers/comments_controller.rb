@@ -6,6 +6,13 @@ class CommentsController < ApplicationController
         :FLAGGED => 'flagged',
     }
 
+    def index
+        @article = Article.find(params[:article_id])
+        @submit_status = params["status"] && SUBMIT_STATUSES.values.include?(params["status"]) ? params["status"] : "approved"
+        @comments = @article.comments.where("submit_status = '#{@submit_status}'")
+        render json: @submit_status
+    end
+
     def create
         @article = Article.find(params[:article_id])
         @comment = @article.comments.create(comment_params)
