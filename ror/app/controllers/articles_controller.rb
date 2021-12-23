@@ -33,10 +33,10 @@ class ArticlesController < ApplicationController
   def update
     @article = Article.find(params[:id])
 
-    if @article.save
+    if @article.update(article_params)
       render json: @article
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -49,6 +49,6 @@ class ArticlesController < ApplicationController
 
   private
     def article_params
-      params.require(:article).permit(:title, :body, :status)
+      params.permit(:title, :body, :status)
     end
 end
