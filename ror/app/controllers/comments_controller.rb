@@ -1,6 +1,10 @@
 class CommentsController < ApplicationController
 
-    http_basic_authenticate_with name: "user1", password: "pass1", only: :destroy
+    SUBMIT_STATUSES = {
+        :SUBMITTED => 'submitted',
+        :APPROVED => 'approved',
+        :FLAGGED => 'flagged',
+    }
 
     def create
         @article = Article.find(params[:article_id])
@@ -17,6 +21,10 @@ class CommentsController < ApplicationController
 
     private
         def comment_params
-            params.require(:comment).permit(:commenter, :body, :status)
+            # set the initial status to SUBMITTED for new comments
+            params
+                .require(:comment)
+                .permit(:commenter, :body, :status)
+                .merge(submit_status: SUBMIT_STATUSES[:SUBMITTED])
         end
 end

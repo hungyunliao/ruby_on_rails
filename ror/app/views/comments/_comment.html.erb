@@ -9,6 +9,11 @@
 </p>
 
 <p>
+    <strong>Status:</strong>
+    <%= comment.submit_status %>
+</p>
+
+<p>
     <%= link_to "Destroy Comment", [comment.article, comment],
                 method: :delete,
                 data: { confirm: "Are you sure?" } %>
