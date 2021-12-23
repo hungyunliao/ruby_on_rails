@@ -25,7 +25,7 @@ class CommentsController < ApplicationController
 
     def create
         @article = Article.find(params[:article_id])
-        @comment = @article.comments.create(comment_params(true))
+        @comment = @article.comments.create(comment_params)
         render json: @comment
     end
 
@@ -37,7 +37,7 @@ class CommentsController < ApplicationController
 
     def update
         @comment = Comment.find(params[:id])
-        if @comment.update(comment_params(false))
+        if @comment.update(comment_params)
             render json: @comment
         else
             render :edit, status: :unprocessable_entity
@@ -52,17 +52,10 @@ class CommentsController < ApplicationController
     end
 
     private
-        def comment_params(creating = true)
-            
-            # TODO: refactor this logic to be DRY.
-            if creating
-                # set the initial status to SUBMITTED for new comments
-                params
-                    .permit(:commenter, :body, :status)
-                    .merge(submit_status: SUBMIT_STATUSES[:SUBMITTED])
-            else
-                params
-                    .permit(:commenter, :body, :status)
-            end
+        def comment_params
+            # Either CREATE or UPDATE, we always need to set the submit_status to "submitted".
+            params
+                .permit(:commenter, :body, :status)
+                .merge(submit_status: SUBMIT_STATUSES[:SUBMITTED])
         end
 end
