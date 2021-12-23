@@ -2,21 +2,24 @@ class ArticlesController < ApplicationController
 
   def index
     @articles = Article.all
+    render json: @articles
   end
 
   def show
     @article = Article.find(params[:id])
+    render json: @article
   end
 
   def new
     @article = Article.new
+    render json: @article
   end
 
   def create
     @article = Article.new(article_params)
 
     if @article.save
-      redirect_to @article
+      render json: @article
     else
       render :new
     end
@@ -24,13 +27,14 @@ class ArticlesController < ApplicationController
 
   def edit
     @article = Article.find(params[:id])
+    render json: @article
   end
 
   def update
     @article = Article.find(params[:id])
 
     if @article.save
-      redirect_to @article
+      render json: @article
     else
       render :edit
     end
