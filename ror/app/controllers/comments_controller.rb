@@ -26,6 +26,7 @@ class CommentsController < ApplicationController
     def create
         @article = Article.find(params[:article_id])
         @comment = @article.comments.create(comment_params)
+        CommentStatusCheckWorker.perform_async(@comment.id)
         render json: @comment
     end
 
@@ -38,6 +39,7 @@ class CommentsController < ApplicationController
     def update
         @comment = Comment.find(params[:id])
         if @comment.update(comment_params)
+            CommentStatusCheckWorker.perform_async(@comment.id)
             render json: @comment
         else
             render :edit, status: :unprocessable_entity
