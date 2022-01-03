@@ -1,0 +1,6 @@
+- Clone the codebase to your local machine.
+- Run `make build`
+- Run `make up`
+- Run `docker-compose run web rake db:create`
+- Run `docker-compose run web rake db:migrate`
+- You should be able to access the application at `http://localhost:3000`
