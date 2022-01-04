@@ -19,8 +19,24 @@ class TagsController < ApplicationController
         end
     end
 
-    def destroy
+    def update
         # find_by() returns nil if nothing found. find() raises an exception.
+        @tag = Tag.find_by(id: params[:id])
+        if !@tag
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                        "Tag does not exist.")
+        else
+            if @tag.update(tag_params)
+                render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                            @tag)
+            else
+                render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                            "Fail to update the tag.")
+            end
+        end
+    end
+
+    def destroy
         @tag = Tag.find_by(id: params[:id])
         if !@tag
             render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
