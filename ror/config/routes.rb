@@ -4,6 +4,13 @@ Rails.application.routes.draw do
 
   resources :articles do
     resources :comments
+    get "/tags", to: "tags#article_tags"
+    post "/tags", to: "tags#attach_tag"
+    delete "/tags/:id", to: "tags#detach_tag"
+  end
+
+  resources :tags do
+    get "/articles", to: "tags#retreive_articles"
   end
 
   get "/users/:id", to: "users#show"
