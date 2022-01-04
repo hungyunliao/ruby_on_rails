@@ -1,16 +1,21 @@
 class TagsController < ApplicationController
+    include JsonResponse
+
     def index
         @filter = params["filter"]
         @tags = @filter? Tag.where("name LIKE ?", "%#{@filter}%") : Tag.all
-        render json: json_response("success", @tags)
+        render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                    @tags)
     end
 
     def create
         @tag = Tag.new(tag_params)
         if @tag.save
-            render json: json_response("success", @tag)
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                        @tag)
         else
-            render json: json_response("error", @tag.errors)
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                        @tag.errors)
         end
     end
 
@@ -18,12 +23,14 @@ class TagsController < ApplicationController
         # find_by() returns nil if nothing found. find() raises an exception.
         @tag = Tag.find_by(id: params[:id])
         if !@tag
-            render json: json_response("error", "Tag does not exist.")
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                        "Tag does not exist.")
         elsif @tag.taggings_count == 0
             @tag.destroy
-            render json: json_response("success")
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS])
         else
-            render json: json_response("error", "Cannot delete the tag.")
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                        "Cannot delete the tag.")
         end
     end
     
@@ -32,17 +39,25 @@ class TagsController < ApplicationController
     #
     def article_tags
         @article = Article.find_by(id: params[:article_id])
-        render json_response("success", @article.tags)
+        render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                    @article.tags)
     end
 
     def attach_tag
         @article = Article.find_by(id: params[:article_id])
         @tag = Tag.find(params[:tag_id])
         if @tag
-            @article.tags << @tag
-            render json: json_response("success", @article.tags)
+            begin
+                @article.tags << @tag
+                render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                            @article.tags)
+            rescue ActiveRecord::RecordInvalid => error
+                render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                            "Tag already attached.")
+            end
         else
-            render json: json_response("error", "Tag does not exist.")
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                        "Tag does not exist.")
         end
     end
 
@@ -54,12 +69,19 @@ class TagsController < ApplicationController
                 @article.tags.delete(tag)
             end
         end
-        render json: json_response("success", @article.tags)
+        render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                    @article.tags)
     end
 
     def retreive_articles
         @tag = Tag.find_by(id: params[:tag_id])
-        render json: json_response("success", @tag.articles)
+        if @tag
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:SUCCESS],
+                                        @tag.articles)
+        else
+            render json: json_response(JsonResponse::RESPONSE_STATUS[:ERROR],
+                                        "Tag does not exist.")
+        end
     end
 
     private
