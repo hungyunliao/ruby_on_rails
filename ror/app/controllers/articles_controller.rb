@@ -21,7 +21,7 @@ class ArticlesController < ApplicationController
     if @article.save
       render json: @article
     else
-      render :new
+      render json: { "error" => @article.errors }
     end
   end
 
