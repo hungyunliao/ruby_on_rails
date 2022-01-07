@@ -1,14 +1,14 @@
 class Article < ApplicationRecord
-    include Visible
+  include Visible
 
-    validates_uniqueness_of :title
+  validates_uniqueness_of :title
 
-    has_many :comments, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
-    # Many-to-many relation to Tag through Tagging
-    has_many :taggings, dependent: :destroy
-    has_many :tags, :through => :taggings
+  # Many-to-many relation to Tag through Tagging
+  has_many :taggings, dependent: :destroy
+  has_many :tags, :through => :taggings
 
-    validates :title, presence: true
-    validates :body, presence: true, length: { minimum: 10 }
+  validates :title, presence: true
+  validates :body, presence: true, length: { minimum: 10 }
 end
