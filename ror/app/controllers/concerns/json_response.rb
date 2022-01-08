@@ -6,4 +6,11 @@ module JsonResponse
     error:   'error'
   }
 
+  def json_response(status, message = '')
+    {
+      status:   status,
+      message:  message
+    }
+  end
+
 end
