@@ -1,54 +1,67 @@
-class ArticlesController < ApplicationController
+class ArticlesController < BaseController
+  include JsonResponse
 
+  ##
+  # Fetch all articles.
+  #
+  # @return [Array<Article>] a list of Articles.
   def index
     @articles = Article.all
-    render json: @articles
+    render json: json_response(RESPONSE_STATUS[:success], @articles)
   end
 
+  ##
+  # Fetch certain article by id.
+  #
+  # @return [Article] the article object.
   def show
     @article = Article.find(params[:id])
-    render json: @article
+    render json: json_response(RESPONSE_STATUS[:success], @article)
   end
 
-  def new
-    @article = Article.new
-    render json: @article
-  end
-
+  ##
+  # Create an article.
+  #
+  # @return [Article] the article object.
   def create
     @article = Article.new(article_params)
 
     if @article.save
-      render json: @article
+      render json: json_response(RESPONSE_STATUS[:success], @article), status: :created
     else
-      render json: { error: @article.errors }
+      render json: json_response(RESPONSE_STATUS[:error], @article.errors), status: :unprocessable_entity
     end
   end
 
-  def edit
-    @article = Article.find(params[:id])
-    render json: @article
-  end
-
+  ##
+  # Update an article.
+  #
+  # @return [Article] the article object being updated.
   def update
     @article = Article.find(params[:id])
 
     if @article.update(article_params)
-      render json: @article
+      render json: json_response(RESPONSE_STATUS[:success], @article)
     else
-      render :edit, status: :unprocessable_entity
+      render json: json_response(RESPONSE_STATUS[:error], @article.errors), status: :unprocessable_entity
     end
   end
 
+  ##
+  # Destroy an article.
   def destroy
     @article = Article.find(params[:id])
     @article.destroy
 
-    redirect_to root_path
+    if @article.destroyed?
+      render json: json_response(RESPONSE_STATUS[:success]), status: :no_content
+    else
+      render json: json_response(RESPONSE_STATUS[:error], @article.errors), status: :unprocessable_entity
+    end
   end
 
   private
-    def article_params
-      params.permit(:title, :body, :status)
-    end
+  def article_params
+    params.require(:article).permit(:title, :body, :status)
+  end
 end

@@ -94,12 +94,12 @@ RSpec.describe 'Tag requests', type: :request do
 
   before do
     post '/articles', params: {
-      :title  => existed_article_title,
-      :body   => existed_article_body,
-      :status => existed_article_status
+      "article[title]"  => existed_article_title,
+      "article[body]"   => existed_article_body,
+      "article[status]" => existed_article_status
     }
 
-    @existed_article_object = JSON.parse(response.body)
+    @existed_article_object = JSON.parse(response.body)['message']
     @existed_article_id     = @existed_article_object['id']
   end
 
