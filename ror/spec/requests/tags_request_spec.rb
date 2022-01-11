@@ -48,7 +48,7 @@ RSpec.describe 'Tag requests', type: :request do
     end
 
     context 'with an invalid tag id' do
-      let(:expected) { 'Tag not found.' }
+      let(:expected) { {} }
 
       before { put "/tags/#{invalid_tag_id}", params: { :name => updated_tag_name } }
 
@@ -159,7 +159,7 @@ RSpec.describe 'Tag requests', type: :request do
       end
 
       it 'returns an error' do
-        @expected = 'Cannot delete the tag.'
+        @expected = { 'base' => ['Cannot delete Tag. Tag being referenced.'] }
         expect(JSON.parse(response.body)['message']).to eq(@expected)
       end
 
