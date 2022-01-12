@@ -48,11 +48,11 @@ RSpec.describe 'Tag requests', type: :request do
     end
 
     context 'with an invalid tag id' do
-      let(:expected) { {} }
+      let(:expected) { { 'errors' => { 'id' => ['errors.messages.not_found'] } } }
 
       before { put "/tags/#{invalid_tag_id}", params: { :name => updated_tag_name } }
 
-      it('returns an error message') { expect(JSON.parse(response.body)['message']).to eq(expected) }
+      it('returns an error message') { expect(JSON.parse(response.body)).to eq(expected) }
     end
   end
 
