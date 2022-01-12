@@ -61,3 +61,5 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # For concurrent processing.
 gem 'sidekiq'
+
+gem 'active_model_serializers'
