@@ -1,5 +1,4 @@
 class TagsController < BaseController
-  include JsonResponse
 
   ##
   # Fetch all tags. An optional url params 'filter' can be included in the request. If a filter is included, the action
@@ -9,7 +8,7 @@ class TagsController < BaseController
   def index
     @filter = params['filter']
     @tags   = @filter ? Tag.where('name LIKE ?', "%#{@filter}%") : Tag.all
-    render json: json_response(RESPONSE_STATUS[:success], @tags)
+    render json: ActiveModelSerializers::SerializableResource.new(@tags, each_serializer: TagSerializer).as_json
   end
 
   ##
@@ -18,7 +17,7 @@ class TagsController < BaseController
   # @return [Tag] the tag object.
   def show
     @tag = Tag.find(params[:id])
-    render json: json_response(RESPONSE_STATUS[:success], @tag)
+    render json: ActiveModelSerializers::SerializableResource.new(@tag, serializer: TagSerializer).as_json
   end
 
   ##
@@ -29,9 +28,10 @@ class TagsController < BaseController
     @tag = Tag.new(tag_params)
 
     if @tag.save
-      render json: json_response(RESPONSE_STATUS[:success], @tag), status: :created
+      render json: ActiveModelSerializers::SerializableResource.new(@tag, serializer: TagSerializer).as_json, status: :created
     else
-      render json: json_response(RESPONSE_STATUS[:error], @tag.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@tag, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -43,9 +43,10 @@ class TagsController < BaseController
     @tag = Tag.find(params[:id])
 
     if @tag.update(tag_params)
-      render json: json_response(RESPONSE_STATUS[:success], @tag)
+      render json: ActiveModelSerializers::SerializableResource.new(@tag, serializer: TagSerializer).as_json
     else
-      render json: json_response(RESPONSE_STATUS[:error], @tag.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@tag, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -57,9 +58,10 @@ class TagsController < BaseController
     @tag.destroy
 
     if @tag.destroyed?
-      render json: json_response(RESPONSE_STATUS[:success]), status: :no_content
+      render json: {}, status: :no_content
     else
-      render json: json_response(RESPONSE_STATUS[:error], @tag.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@tag, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -73,7 +75,7 @@ class TagsController < BaseController
   # @return [Array<Tag>] a list of Tags.
   def article_tags
     @article = Article.find(params[:article_id])
-    render json: json_response(RESPONSE_STATUS[:success], @article.tags)
+    render json: ActiveModelSerializers::SerializableResource.new(@article.tags, each_serializer: TagSerializer).as_json
   end
 
   ##
@@ -85,9 +87,10 @@ class TagsController < BaseController
 
     if @tagging.save
       @article = Article.find(params[:article_id])
-      render json: json_response(RESPONSE_STATUS[:success], @article.tags)
+      render json: ActiveModelSerializers::SerializableResource.new(@article.tags, each_serializer: TagSerializer).as_json
     else
-      render json: json_response(RESPONSE_STATUS[:error], @tagging.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@tagging, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -99,16 +102,17 @@ class TagsController < BaseController
     @tagging = Tagging.find_by(article_id: params[:article_id], tag_id: params[:id])
 
     unless @tagging
-      return render json: json_response(RESPONSE_STATUS[:error]), status: :not_found
+      return not_found_error
     end
 
     @tagging.destroy
 
     if @tagging.destroyed?
       @article = Article.find(params[:article_id])
-      render json: json_response(RESPONSE_STATUS[:success], @article.tags)
+      render json: ActiveModelSerializers::SerializableResource.new(@article.tags, each_serializer: TagSerializer).as_json
     else
-      render json: json_response(RESPONSE_STATUS[:error]), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@tagging, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -119,11 +123,12 @@ class TagsController < BaseController
   def retreive_articles
     @tag      = Tag.find(params[:tag_id])
     @articles = @tag.articles
-    render json: json_response(RESPONSE_STATUS[:success], @articles)
+    render json: ActiveModelSerializers::SerializableResource.new(@tarticles, serializer: ArticleSerializer).as_json
   end
 
   private
+
   def tag_params
-    params.permit(:name)
+    params.require(:tag).permit(:name)
   end
 end
