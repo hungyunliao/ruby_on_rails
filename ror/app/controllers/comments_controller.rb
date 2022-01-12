@@ -8,8 +8,8 @@ class CommentsController < BaseController
 
   ##
   # Fetch all comments. An optional url params 'status' [String] can be included in the request.
-  # If the 'status' params is included, this action will return all comments with the status given, otherwise, it returns all the comments
-  # with the status 'approved'.
+  # If the 'status' params is included, this action will return all comments with the status given, otherwise, it returns all the comments with the status
+  # 'approved'.
   #
   # @return [Array<Article>] a list of Articles.
   def index
@@ -29,8 +29,8 @@ class CommentsController < BaseController
   end
 
   ##
-  # Create a comment and associate it with an article. All newly created comment's submit_status is defaulted to 'submitted' and will be queued up
-  # as a Sidekiq job, which will be processed in parallel by CommentStatusCheckWorker (bad words checker) and the submit_status will be updated.
+  # Create a comment and associate it with an article. All newly created comment's submit_status is defaulted to 'submitted' and will be queued up as a Sidekiq
+  # job, which will be processed in parallel by CommentStatusCheckWorker (bad words checker) and the submit_status will be updated.
   #
   # @return [Comment] the comment object.
   def create
@@ -47,8 +47,7 @@ class CommentsController < BaseController
   end
 
   ##
-  # Update a comment. Everytime a comment is updated, the submit_status will be reset to 'submitted' and the Sidekiq process will be
-  # triggered again.
+  # Update a comment. Everytime a comment is updated, the submit_status will be reset to 'submitted' and the Sidekiq process will be triggered again.
   #
   # @return [Comment] the comment object being updated.
   def update

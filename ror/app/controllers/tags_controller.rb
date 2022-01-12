@@ -1,8 +1,8 @@
 class TagsController < BaseController
 
   ##
-  # Fetch all tags. An optional url params 'filter' can be included in the request. If a filter is included, the action
-  # will return all tags containing the keyword specified by the params 'filter', otherwise, it will return all tags.
+  # Fetch all tags. An optional url params 'filter' can be included in the request. If a filter is included, the action will return all tags containing the
+  # keyword specified by the params 'filter', otherwise, it will return all tags.
   #
   # @return [Array<Tag>] a list of Tags.
   def index
@@ -51,8 +51,7 @@ class TagsController < BaseController
   end
 
   ##
-  # Destroy a tag. A tag is not destroyable if there is any article associated with it. This logic is handled at the
-  # Model layer (Tag).
+  # Destroy a tag. A tag is not destroyable if there is any article associated with it. This logic is handled at the Model layer (Tag).
   def destroy
     @tag = Tag.find(params[:id])
     @tag.destroy
