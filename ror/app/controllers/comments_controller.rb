@@ -39,7 +39,7 @@ class CommentsController < BaseController
 
     if @comment.save
       CommentStatusCheckWorker.perform_async(@comment.id)
-      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: CommentSerializer).as_json
+      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: CommentSerializer).as_json, status: :created
     else
       render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: ErrorSerializer, adapter: :attributes).as_json,
                    status: :unprocessable_entity
