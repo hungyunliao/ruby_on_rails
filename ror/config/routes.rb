@@ -12,6 +12,4 @@ Rails.application.routes.draw do
   resources :tags do
     get "/articles", to: "tags#retreive_articles"
   end
-
-  get "/users/:id", to: "users#show"
 end
