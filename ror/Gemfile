@@ -63,3 +63,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'sidekiq'
 
 gem 'active_model_serializers'
+
+# For rspec mocking.
+gem 'factory_bot_rails'
