@@ -1,5 +1,4 @@
 class CommentsController < BaseController
-  include JsonResponse
 
   SUBMIT_STATUS = {
     submitted: 'submitted',
@@ -17,7 +16,7 @@ class CommentsController < BaseController
     @article        = Article.find(params[:article_id])
     @submit_status  = params['status'] && SUBMIT_STATUS.values.include?(params['status']) ? params['status'] : SUBMIT_STATUS[:approved]
     @comments       = @article.comments.where("submit_status = '#{@submit_status}'")
-    render json: json_response(RESPONSE_STATUS[:success], @comments)
+    render json: ActiveModelSerializers::SerializableResource.new(@comments, each_serializer: CommentSerializer).as_json
   end
 
   ##
@@ -26,7 +25,7 @@ class CommentsController < BaseController
   # @return [Comment] the comment object.
   def show
     @comment = Comment.find(params[:id])
-    render json: json_response(RESPONSE_STATUS[:success], @comment)
+    render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: CommentSerializer).as_json
   end
 
   ##
@@ -40,9 +39,10 @@ class CommentsController < BaseController
 
     if @comment.save
       CommentStatusCheckWorker.perform_async(@comment.id)
-      render json: json_response(RESPONSE_STATUS[:success], @comment)
+      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: CommentSerializer).as_json
     else
-      render json: json_response(RESPONSE_STATUS[:error], @comment.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -56,9 +56,10 @@ class CommentsController < BaseController
 
     if @comment.update(comment_params)
       CommentStatusCheckWorker.perform_async(@comment.id)
-      render json: json_response(RESPONSE_STATUS[:success], @comment)
+      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: CommentSerializer).as_json
     else
-      render json: json_response(RESPONSE_STATUS[:error], @comment.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
@@ -70,13 +71,15 @@ class CommentsController < BaseController
     @comment.destroy
 
     if @comment.destroyed?
-      render json: json_response(RESPONSE_STATUS[:success]), status: :no_content
+      render json: {}, status: :no_content
     else
-      render json: json_response(RESPONSE_STATUS[:error], @comment.errors), status: :unprocessable_entity
+      render json: ActiveModelSerializers::SerializableResource.new(@comment, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
   private
+
   def comment_params
     params
       .require(:comment)
