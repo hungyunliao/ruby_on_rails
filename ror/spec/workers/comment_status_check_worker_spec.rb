@@ -2,20 +2,15 @@ require 'rails_helper'
 
 RSpec.describe CommentStatusCheckWorker, type: :worker do
   describe '.perform' do
-    let(:article) do
-      @article = Article.new(title: 'article title', body: 'article body', status: 'public')
-      @article.save
-      @article
-    end
+    let(:article) { create(:article) }
 
     context 'with a body that contains bad words' do
       let(:comment) do
-        @comment = article.comments.create(body: 'comment body worse', commenter: 'comment commenter')
-        @comment.save
+        @comment = create(:comment, body: 'comment body worse', commenter: 'comment commenter', article_id: article.id)
 
         CommentStatusCheckWorker.new.perform(@comment.id)
 
-        @comment = Comment.find(@comment.id)
+        Comment.find(@comment.id)
       end
 
 
@@ -24,12 +19,11 @@ RSpec.describe CommentStatusCheckWorker, type: :worker do
 
     context 'with a body that does not contain bad words' do
       let(:comment) do
-        @comment = article.comments.create(body: 'comment body good', commenter: 'comment commenter')
-        @comment.save
+        @comment = create(:comment, body: 'comment body good', commenter: 'comment commenter', article_id: article.id)
 
         CommentStatusCheckWorker.new.perform(@comment.id)
 
-        @comment = Comment.find(@comment.id)
+        Comment.find(@comment.id)
       end
 
       it('approves the comment') { expect(comment.submit_status).to eq('approved') }
