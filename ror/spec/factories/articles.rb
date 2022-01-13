@@ -1,7 +1,7 @@
 FactoryBot.define do
 
   factory :article do
-    title  { 'factory article title' }
+    title  { |counter| "factory article title #{counter}" }
     body   { 'factory article body' }
     status { 'public' }
   end

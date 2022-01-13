@@ -74,5 +74,6 @@ RSpec.describe 'Article requests', type: :request do
     before { delete "/articles/#{article.id}" }
 
     it('returns status code 204') { expect(response).to have_http_status(204) }
+    it('deletes the article')     { expect(Article.find_by(id: article.id)).to be_nil }
   end
 end

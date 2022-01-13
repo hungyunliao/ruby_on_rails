@@ -1,5 +1,7 @@
 class Tag < ApplicationRecord
 
+  scope :with_name_like, ->(name) { where("name LIKE '%#{name}%'") }
+
   validates_uniqueness_of :name
 
   # Many-to-many relation to Article through Tagging
