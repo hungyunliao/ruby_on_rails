@@ -1,50 +1,61 @@
-class ArticlesController < ApplicationController
+class ArticlesController < BaseController
 
+  ##
+  # Fetch all articles.
   def index
-    @articles = Article.all
+    articles = Article.all
+    render json: articles
   end
 
+  ##
+  # Fetch certain article by id.
   def show
-    @article = Article.find(params[:id])
+    article = Article.find(params[:id])
+    render json: article
   end
 
-  def new
-    @article = Article.new
-  end
-
+  ##
+  # Create an article.
   def create
-    @article = Article.new(article_params)
+    article = Article.new(article_params)
 
-    if @article.save
-      redirect_to @article
+    if article.save
+      render json: article, status: :created
     else
-      render :new
+      render json: ActiveModelSerializers::SerializableResource.new(article, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
-  def edit
-    @article = Article.find(params[:id])
-  end
-
+  ##
+  # Update an article.
   def update
-    @article = Article.find(params[:id])
+    article = Article.find(params[:id])
 
-    if @article.save
-      redirect_to @article
+    if article.update(article_params)
+      render json: article
     else
-      render :edit
+      render json: ActiveModelSerializers::SerializableResource.new(article, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
     end
   end
 
+  ##
+  # Destroy an article.
   def destroy
-    @article = Article.find(params[:id])
-    @article.destroy
+    article = Article.find(params[:id])
 
-    redirect_to root_path
+    if article.destroy
+      render json: {}, status: :no_content
+    else
+      render json: ActiveModelSerializers::SerializableResource.new(article, serializer: ErrorSerializer, adapter: :attributes).as_json,
+                   status: :unprocessable_entity
+    end
   end
 
   private
-    def article_params
-      params.require(:article).permit(:title, :body, :status)
-    end
+
+  def article_params
+    params.require(:article).permit(:title, :body, :status)
+  end
 end
